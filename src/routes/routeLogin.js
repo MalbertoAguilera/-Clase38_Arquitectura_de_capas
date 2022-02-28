@@ -14,9 +14,10 @@ routerLogin.get("/home", (req, res) => {
     return res.redirect("/login");
   }
 
-  res.render(path.join(process.cwd(), "public/index.ejs"), {
-    nombre: req.session.nombre,
-  });
+  // res.render(path.join(process.cwd(), "views/index.ejs"), {
+  //   nombre: req.session.nombre,
+  // });
+  res.render("index.ejs", { nombre: req.session.nombre });
 });
 
 routerLogin.get("/login", (req, res) => {
@@ -24,7 +25,8 @@ routerLogin.get("/login", (req, res) => {
   if (nombre) {
     res.redirect("/");
   } else {
-    res.sendFile(path.join(process.cwd(), "public/views/login.html"));
+    res.render("login");
+    // res.sendFile(path.join(process.cwd(), "public/views/login.html"));
   }
 });
 
@@ -38,9 +40,10 @@ routerLogin.get("/logout", (req, res) => {
   if (nombre) {
     req.session.destroy((err) => {
       if (!err) {
-        res.render(path.join(process.cwd(), "public/views/pages/logout.ejs"), {
-          nombre,
-        });
+        res.render('pages/logout.ejs',{nombre})
+        // res.render(path.join(process.cwd(), "src/views/pages/logout.ejs"), {
+        //   nombre,
+        // });
       } else {
         res.redirect("/");
       }

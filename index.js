@@ -1,92 +1,99 @@
-//configuracion websocket
-const express = require("express");
-const res = require("express/lib/response");
-const app = express();
-const http = require("http");
-const server = http.createServer(app);
-const io = require("socket.io")(server);
-// FIN configuracion websocket
+var socket = io();
 
-const Contenedor = require("./class/Contenedor");
-const filePathProducts = "./db/productos.txt";
-const filePathMessages = "./db/messages.txt";
-const handlerProducts = new Contenedor(filePathProducts);
-const handlerMessages = new Contenedor(filePathMessages);
-const listarMensajesNormalizados = require("./utils/listarMensajesNormalizados");
-const objectSession = require("./config/session");
-const session = require("express-session");
+/* --------------------- DESNORMALIZACIÓN DE MENSAJES ---------------------------- */
+// Definimos un esquema de autor
+const schemaAuthor = new normalizr.schema.Entity('author', {}, { idAttribute: 'id' });
 
-const dotenv = require("dotenv").config();
+// Definimos un esquema de mensaje
+const schemaMensaje = new normalizr.schema.Entity('post', { author: schemaAuthor }, { idAttribute: '_id' })
 
+// Definimos un esquema de posts
+const schemaMensajes = new normalizr.schema.Entity('posts', { mensajes: [schemaMensaje] }, { idAttribute: 'id' })
 
-//-----------rutas
-const routeNumAleatorios = require("./routes/numerosAleatorios");
-const routeInfo = require("./routes/routeInfo");
-const routeProductosTest = require("./routes/routeProductosTest");
-const routeLogin = require("./routes/routeLogin");
-//-----------rutas
+socket.on("server_sendProducts", (arrProducts) => {
+  renderTable(arrProducts);
+});
 
-const cluster = require("cluster");
-const numCPU = require("os").cpus().length;
-const parseArg = require("minimist");
+socket.on("server_sendMessages", (mensajesN) => {
+  let mensajesNsize = JSON.stringify(mensajesN).length;
+  console.log(mensajesN);
+  console.log("--------------TAMAÑO-------------------" ,mensajesNsize);
 
-const options = { default: { port: 8080 } };
-const objectMinimist = parseArg(process.argv.slice(2), options);
-const PORT = objectMinimist.port; //pasar como --port=(numero)
-const modoCluster = objectMinimist.modo ==="cluster";
+  let mensajesD = normalizr.denormalize(mensajesN.result, schemaMensajes, mensajesN.entities);
 
+  let mensajesDsize = JSON.stringify(mensajesD).length;
+  console.log(mensajesD);
+  console.log("--------------TAMAÑO-------------------" ,mensajesDsize);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static("public"));
-app.set("view engine", "ejs");
-app.use(session(objectSession));
+  let porcentajeC = parseInt((mensajesNsize * 100) / mensajesDsize)
+  console.log(`---------------Porcentaje de compresión ${porcentajeC}%    ------------------`)
 
-if (modoCluster && cluster.isMaster) {
-  for (let index = 0; index < numCPU; index++) {
-    cluster.fork();
-  }
-} else {
+  renderMessages(mensajesD.mensajes);
+});
 
-  app.use(routeNumAleatorios);
-  app.use(routeInfo);
-  app.use(routeProductosTest);
-  app.use(routeLogin);
-  
+//Funciones CHAT
 
-  //websocket
-  //abre canal de parte del servidor
-  //connection EVENTO
-  io.on("connection", async (socket) => {
-    console.log("Cliente conectado");
+const addInfo = () => {
+  let objMessage = {
+    author: {
+      email: document.querySelector("#id").value,
+      nombre: document.querySelector("#nombre").value,
+      apellido: document.querySelector("#apellido").value,
+      edad: document.querySelector("#edad").value,
+      avatar: "https://picsum.photos/50",
+      alias: document.querySelector("#alias").value,
+    },
+    text: document.querySelector("#text").value,
+  };
 
-    //Socket PRODUCTOS
-    socket.emit("server_sendProducts", await handlerProducts.getAll());
+  socket.emit("client_newMessage", objMessage);
+  document.querySelector("#text").value = "";
+  return false;
+};
 
-    socket.on("client_newProduct", async (item) => {
-      await handlerProducts.save(item);
-      io.emit("server_sendProducts", await handlerProducts.getAll());
-    });
-    //FIN Socket PRODUCTOS
+const renderMessages = (objChat) => {
+  let html = objChat
+    .map((message) => {
+      return `<p><img src="${message.author.avatar}"> <strong style="color: blue">${message.author.alias}: </strong> <span style="color: brown">[${message.date}]</span> <span style="color: green"> <em>${message.text} </em> </span> </p>`;
+    })
+    .join("");
 
-    //Socket MENSAJES
-    socket.emit(
-      "server_sendMessages",
-      listarMensajesNormalizados(await handlerMessages.getAll())
-    );
+  document.querySelector("#boxMessages").innerHTML = html;
+};
 
-    socket.on("client_newMessage", async (objmessage) => {
-      await handlerMessages.save(objmessage);
-      io.emit(
-        "server_sendMessages",
-        listarMensajesNormalizados(await handlerMessages.getAll())
-      );
-    });
-  });
+//funciones PRODUCTOS
 
+const addProduct = () => {
+  let objMsn = {
+    title: document.querySelector("#title").value,
+    price: document.querySelector("#price").value,
+    thumbnail: "https://picsum.photos/50",
+  };
 
-  server.listen(PORT, () => {
-    console.log(`El servidor se encuentra escuchando por el puerto ${server.address().port} --- PID ${process.pid}`);
-  });
-  server.on("error", (error) => console.log(`Error en servidor ${error}`));
-}
+  socket.emit("client_newProduct", objMsn);
+
+  document.querySelector("#title").value = "";
+  document.querySelector("#price").value = "";
+  document.querySelector("#thumbnail").value = "";
+
+  return false;
+};
+
+const renderTable = (data) => {
+  let table = data
+    .map((item) => {
+      return `
+        <tr>
+          <th scope="row">${item.title}</th>
+          <td>$${item.price}</td>
+          <td>
+            <img
+              src="${item.thumbnail}"
+              alt="${item.title}"
+            />
+          </td>
+        </tr>`;
+    })
+    .join(" ");
+  document.querySelector("#itemsTable").innerHTML = table;
+};
