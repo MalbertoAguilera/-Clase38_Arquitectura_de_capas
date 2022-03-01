@@ -24,7 +24,7 @@ const dotenv = require("dotenv").config();
 const routeNumAleatorios = require("./routes/numerosAleatorios");
 const routeInfo = require("./routes/routeInfo");
 const routeProductosTest = require("./routes/routeProductosTest");
-const routeLogin = require("./routes/routeLogin");
+const routeAuth = require("./routes/routeAuth");
 //-----------rutas
 
 const cluster = require("cluster");
@@ -36,7 +36,6 @@ const objectMinimist = parseArg(process.argv.slice(2), options);
 const PORT = objectMinimist.port; //pasar como --port=(numero)
 const modoCluster = objectMinimist.modo ==="cluster";
 
-console.log(path.join(__dirname, 'public'));
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -54,7 +53,7 @@ if (modoCluster && cluster.isMaster) {
   app.use(routeNumAleatorios);
   app.use(routeInfo);
   app.use(routeProductosTest);
-  app.use(routeLogin);
+  app.use(routeAuth);
   
 
   //websocket

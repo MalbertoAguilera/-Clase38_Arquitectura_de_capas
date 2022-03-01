@@ -1,26 +1,19 @@
-const express = require("express");
-const { Router } = express;
-const routerLogin = new Router();
-const path = require("path");
-
-routerLogin.get("/", (req, res) => {
+const redirectHomeController = (req, res) => {
   res.redirect("/home");
-});
+};
 
-routerLogin.get("/home", (req, res) => {
+const getHomeController = async (req, res) => {
   const nombre = req.session.nombre;
-  console.log(nombre);
   if (!nombre) {
     return res.redirect("/login");
   }
-
+  res.render("index.ejs", { nombre: req.session.nombre });
   // res.render(path.join(process.cwd(), "views/index.ejs"), {
   //   nombre: req.session.nombre,
   // });
-  res.render("index.ejs", { nombre: req.session.nombre });
-});
+};
 
-routerLogin.get("/login", (req, res) => {
+const getLoginController = async (req, res) => {
   const nombre = req.session.nombre;
   if (nombre) {
     res.redirect("/");
@@ -28,19 +21,17 @@ routerLogin.get("/login", (req, res) => {
     res.render("login");
     // res.sendFile(path.join(process.cwd(), "public/views/login.html"));
   }
-});
-
-routerLogin.post("/login", (req, res) => {
+};
+const postLoginController = (req, res) => {
   req.session.nombre = req.body.nombre;
   res.redirect("/home");
-});
-
-routerLogin.get("/logout", (req, res) => {
+};
+const getLogoutController = (req, res) => {
   const nombre = req.session.nombre;
   if (nombre) {
     req.session.destroy((err) => {
       if (!err) {
-        res.render('pages/logout.ejs',{nombre})
+        res.render("pages/logout.ejs", { nombre });
         // res.render(path.join(process.cwd(), "src/views/pages/logout.ejs"), {
         //   nombre,
         // });
@@ -51,6 +42,12 @@ routerLogin.get("/logout", (req, res) => {
   } else {
     res.redirect("/");
   }
-});
+};
 
-module.exports = routerLogin;
+module.exports = {
+  getHomeController,
+  redirectHomeController,
+  getLoginController,
+  postLoginController,
+  getLogoutController
+};
