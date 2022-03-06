@@ -1,12 +1,8 @@
 const express = require("express");
 const { Router } = express;
-const routerInfo = new Router();
-const numCPU = require("os").cpus().length;
-const objectInfo = require("../config/ObjectInfo");
+const router = new Router();
+const {getInfoController} = require('../controllers/infoController')
 
-routerInfo.get("/info", (req, res) => {
-  objectInfo["qtyOfCPU"] = numCPU;
-  res.json(objectInfo);
-});
+router.get("/info", getInfoController);
 
-module.exports = routerInfo;
+module.exports = router;

@@ -17,11 +17,11 @@ const listarMensajesNormalizados = require("./utils/listarMensajesNormalizados")
 const objectSession = require("./config/session");
 const session = require("express-session");
 
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 
 
 //-----------rutas
-const routeNumAleatorios = require("./routes/numerosAleatorios");
+const routeNumAleatorios = require("./routes/routeNumerosAleatorios");
 const routeInfo = require("./routes/routeInfo");
 const routeProductosTest = require("./routes/routeProductosTest");
 const routeAuth = require("./routes/routeAuth");

@@ -8,7 +8,7 @@ const {
   getLoginController,
   postLoginController,
   getLogoutController
-} = require("../controllers/routeAuthController");
+} = require("../controllers/AuthController");
 
 route.get("/", redirectHomeController);
 

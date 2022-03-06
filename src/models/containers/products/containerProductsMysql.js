@@ -1,0 +1,1 @@
+// metodos del orm

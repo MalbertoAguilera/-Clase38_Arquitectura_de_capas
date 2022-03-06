@@ -19,6 +19,7 @@
     "knex": "^0.95.9",
     "minimist": "^1.2.5",
     "moment": "^2.29.1",
+    "mongoose": "^6.2.4",
     "mysql": "^2.18.1",
     "normalizr": "^3.6.1",
     "socket.io": "^4.3.2"
