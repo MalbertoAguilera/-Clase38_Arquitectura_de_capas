@@ -31,6 +31,9 @@ const cluster = require("cluster");
 const numCPU = require("os").cpus().length;
 const parseArg = require("minimist");
 
+//prueba de conexion al llamar al contenedor
+const ContenedorMongoDb = require('./models/containers/ContenedorMongoDb')
+
 const options = { default: { port: 8080 } };
 const objectMinimist = parseArg(process.argv.slice(2), options);
 const PORT = objectMinimist.port; //pasar como --port=(numero)

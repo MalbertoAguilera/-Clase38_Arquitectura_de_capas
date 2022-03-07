@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const config = require("../config");
+const {mongodb} = require("../config");
 
 class MyMongoClient {
   constructor() {
@@ -9,9 +9,10 @@ class MyMongoClient {
 
   async connect() {
     try {
-      await this.client.connect(config.mongodb.cnxStr, config.mongodb.options);
+      console.log(mongodb.cnxStr);
+      await this.client.connect(mongodb.cnxStr);
       this.conected = true;
-      console.log("Conectado a MongoDB");
+      console.log("Conectado a Mongo ATLAS");
     } catch (error) {
       console.log("error a conectar a mongoDB");
     }

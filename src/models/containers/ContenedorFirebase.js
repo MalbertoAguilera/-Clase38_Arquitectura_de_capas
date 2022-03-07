@@ -1,5 +1,7 @@
-import admin from "firebase-admin"
-import config from '../config.js'
+const admin = require("firebase-admin");
+const config = require("../../config");
+const moment = require("moment");
+const now = moment().format("DD/MM/YYYY HH:mm:ss");
 
 admin.initializeApp({
     credential: admin.credential.cert(config.firebase)
@@ -13,7 +15,7 @@ class ContenedorFirebase {
         this.coleccion = db.collection(nombreColeccion)
     }
 
-    async listar(id) {
+    async getById(id) {
         try {
             const doc = await this.coleccion.doc(id).get();
             if (!doc.exists) {
@@ -27,7 +29,7 @@ class ContenedorFirebase {
         }
     }
 
-    async listarAll() {
+    async getAll() {
         try {
             const result = []
             const snapshot = await this.coleccion.get();
@@ -40,16 +42,16 @@ class ContenedorFirebase {
         }
     }
 
-    async guardar(nuevoElem) {
+    async save(nuevoElem) {
         try {
-            const guardado = await this.coleccion.add(nuevoElem);
-            return { ...nuevoElem, id: guardado.id }
+            const guardado = await this.coleccion.add({...nuevoElem, timeStamp: now});
+            return { ...nuevoElem, id: guardado.id,  timeStamp: now }
         } catch (error) {
             throw new Error(`Error al guardar: ${error}`)
         }
     }
 
-    async actualizar(nuevoElem) {
+    async update(nuevoElem) {
         try {
             const actualizado = await this.coleccion.doc(nuevoElem.id).set(nuevoElem);
             return actualizado
@@ -58,7 +60,7 @@ class ContenedorFirebase {
         }
     }
 
-    async borrar(id) {
+    async deleteById(id) {
         try {
             const item = await this.coleccion.doc(id).delete();
             return item
@@ -67,7 +69,7 @@ class ContenedorFirebase {
         }
     }
 
-    async borrarAll() {
+    async deleteAll() {
         // version fea e ineficiente pero entendible para empezar
         try {
             const docs = await this.listarAll()
@@ -89,8 +91,6 @@ class ContenedorFirebase {
         }
     }
 
-    async desconectar() {
-    }
 }
 
-export default ContenedorFirebase
+module.exports = ContenedorFirebase;

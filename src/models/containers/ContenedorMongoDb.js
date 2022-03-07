@@ -1,12 +1,11 @@
-import mongoose from 'mongoose'
-import config from '../config.js'
-import { asPOJO, renameField, removeField } from '../utils/objectUtils.js'
+const mongoose = require('mongoose');
+const {asPOJO,removeField,renameField} = require('../../utils/objectUtils');
+const MyMongoClient = require('../db/mongoClient');
 
-await mongoose.connect(config.mongodb.cnxStr, config.mongodb.options)
-
+new MyMongoClient().connect();
 class ContenedorMongoDb {
-
-    constructor(nombreColeccion, esquema) {
+    // nombreColeccion, esquema
+    constructor() {
         this.coleccion = mongoose.model(nombreColeccion, esquema)
     }
 
@@ -83,4 +82,4 @@ class ContenedorMongoDb {
     }
 }
 
-export default ContenedorMongoDb
+module.exports = ContenedorMongoDb;

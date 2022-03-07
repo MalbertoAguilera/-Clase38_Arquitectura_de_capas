@@ -2,16 +2,16 @@ let productosDao
 let carritosDao
 
 switch (process.env.PERSISTENCIA || 'mongodb') {
-    case 'firebase':
-        const ProductosDaoFirebase= await import('./productos/ProductosDaoFirebase.js')
-        const CarritosDaoFirebase = await import('./carritos/CarritosDaoFirebase.js')
+    // case 'firebase':
+    //     const ProductosDaoFirebase= await require('./productos/ProductosDaoFirebase.js')
+    //     const CarritosDaoFirebase = await require('./carritos/CarritosDaoFirebase.js')
 
-        productosDao = new ProductosDaoFirebase()
-        carritosDao = new CarritosDaoFirebase()
-        break
+    //     productosDao = new ProductosDaoFirebase()
+    //     carritosDao = new CarritosDaoFirebase()
+    //     break
     case 'mongodb':
-        const ProductosDaoMongoDb  = await import('./productos/ProductosDaoMongoDb.js')
-        const CarritosDaoMongoDb = await import('./carritos/CarritosDaoMongoDb.js')
+        const ProductosDaoMongoDb  = await require('./productos/ProductosDaoMongoDb.js')
+        const CarritosDaoMongoDb = await require('./carritos/CarritosDaoMongoDb.js')
 
         productosDao = new ProductosDaoMongoDb()
         carritosDao = new CarritosDaoMongoDb()
