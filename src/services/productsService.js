@@ -1,31 +1,42 @@
-const ProductsDao = require("../models/daos/productsDao");
-//la capa de servicios no se fija que base de datos esta utilizando para ejecutar la consulta
-//De eso se encarga el DAOS, se comunica con la capa de persistencia
-class ProductsApi {
+const {productosDao} = require('../models/daos/index');
+
+export default class ProductosApi {
   constructor() {
-    this.productsDao = new ProductsDao();
+    this.productosDao = new ProductosDao();
   }
 
-  async agregar(product) {
-    let newProduct = await this.productsDao.add(product);
-    return newProduct;
+  async agregar(prodParaAgregar) {
+    const prodAgregado = await this.productosDao.add(prodParaAgregar);
+    return prodAgregado;
   }
+
   async buscar(id) {
-        let products;
-        if (id) {
-              products=await this.productsDao.getById(id);
-        } else {
-              products=await this.productsDao.getAll();
-        }
-        return products;
+    let productos;
+    if (id) {
+      productos = await this.productosDao.getById(id);
+    } else {
+      productos = await this.productosDao.getAll();
+    }
+    return productos;
   }
+
   async borrar(id) {
-        let products;
-        if (id) {
-              products=await this.productsDao.deleteById(id);
-        } else {
-              products=await this.productsDao.deleteAll();
-        }
-        return products;
+    if (id) {
+      await this.productosDao.deleteById(id);
+    } else {
+      await this.productosDao.deleteAll();
+    }
+  }
+
+  async reemplazar(id, prodParaReemplazar) {
+    const prodReemplazado = await this.productosDao.updateById(
+      id,
+      prodParaReemplazar
+    );
+    return prodReemplazado;
+  }
+
+  exit() {
+    this.productosDao.exit();
   }
 }
