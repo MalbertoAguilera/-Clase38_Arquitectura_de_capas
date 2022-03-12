@@ -9,7 +9,6 @@ class MyMongoClient {
 
   async connect() {
     try {
-      console.log(mongodb.cnxStr);
       await this.client.connect(mongodb.cnxStr);
       this.conected = true;
       console.log("Conectado a Mongo ATLAS");

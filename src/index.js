@@ -5,9 +5,11 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 const io = require("socket.io")(server);
-const path = require('path');
+const path = require("path");
 // FIN configuracion websocket
 
+const addProductsHandlers = require('./routes/webSocket/addProductsHandler');
+const addMensajesHandlers = require('./routes/webSocket/addMessagesHandler');
 const Contenedor = require("./class/Contenedor");
 const filePathProducts = "./src/db/productos.txt";
 const filePathMessages = "./src/db/messages.txt";
@@ -18,7 +20,6 @@ const objectSession = require("./config/session");
 const session = require("express-session");
 
 require("dotenv").config();
-
 
 //-----------rutas
 const routeNumAleatorios = require("./routes/routeNumerosAleatorios");
@@ -31,19 +32,16 @@ const cluster = require("cluster");
 const numCPU = require("os").cpus().length;
 const parseArg = require("minimist");
 
-//prueba de conexion al llamar al contenedor
-const ContenedorMongoDb = require('./models/containers/ContenedorMongoDb')
-
 const options = { default: { port: 8080 } };
 const objectMinimist = parseArg(process.argv.slice(2), options);
 const PORT = objectMinimist.port; //pasar como --port=(numero)
-const modoCluster = objectMinimist.modo ==="cluster";
+const modoCluster = objectMinimist.modo === "cluster";
 
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // app.use(express.static("public"));
-app.set('views', path.join(__dirname,'views'))
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(session(objectSession));
 
@@ -52,46 +50,56 @@ if (modoCluster && cluster.isMaster) {
     cluster.fork();
   }
 } else {
-
   app.use(routeNumAleatorios);
   app.use(routeInfo);
   app.use(routeProductosTest);
   app.use(routeAuth);
-  
 
   //websocket
   //abre canal de parte del servidor
   //connection EVENTO
+
+  // configuro el socket
+
   io.on("connection", async (socket) => {
-    console.log("Cliente conectado");
-
-    //Socket PRODUCTOS
-    socket.emit("server_sendProducts", await handlerProducts.getAll());
-
-    socket.on("client_newProduct", async (item) => {
-      await handlerProducts.save(item);
-      io.emit("server_sendProducts", await handlerProducts.getAll());
-    });
-    //FIN Socket PRODUCTOS
-
-    //Socket MENSAJES
-    socket.emit(
-      "server_sendMessages",
-      listarMensajesNormalizados(await handlerMessages.getAll())
-    );
-
-    socket.on("client_newMessage", async (objmessage) => {
-      await handlerMessages.save(objmessage);
-      io.emit(
-        "server_sendMessages",
-        listarMensajesNormalizados(await handlerMessages.getAll())
-      );
-    });
+    console.log('WEB SOCKET - Nuevo cliente conectado!');
+    addProductsHandlers(socket, io.sockets);
+    addMensajesHandlers(socket, io.sockets);
   });
 
+  // io.on("connection", async (socket) => {
+  //   console.log("Cliente conectado");
+
+  //   //Socket PRODUCTOS
+  //   socket.emit("server_sendProducts", await handlerProducts.getAll());
+
+  //   socket.on("client_newProduct", async (item) => {
+  //     await handlerProducts.save(item);
+  //     io.emit("server_sendProducts", await handlerProducts.getAll());
+  //   });
+  //   //FIN Socket PRODUCTOS
+
+  //   //Socket MENSAJES
+  //   socket.emit(
+  //     "server_sendMessages",
+  //     listarMensajesNormalizados(await handlerMessages.getAll())
+  //   );
+
+  //   socket.on("client_newMessage", async (objmessage) => {
+  //     await handlerMessages.save(objmessage);
+  //     io.emit(
+  //       "server_sendMessages",
+  //       listarMensajesNormalizados(await handlerMessages.getAll())
+  //     );
+  //   });
+  // });
 
   server.listen(PORT, () => {
-    console.log(`El servidor se encuentra escuchando por el puerto ${server.address().port} --- PID ${process.pid}`);
+    console.log(
+      `El servidor se encuentra escuchando por el puerto ${
+        server.address().port
+      } --- PID ${process.pid}`
+    );
   });
   server.on("error", (error) => console.log(`Error en servidor ${error}`));
 }

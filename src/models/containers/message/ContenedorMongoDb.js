@@ -1,13 +1,14 @@
-const MyMongoClient = require('../db/mongoClient');
-const ProductDao = require('../daos/product/ProductDao');
-const productModel = require('../schema/productModel');
-const {asPOJO,removeField,renameField} = require('../../utils/objectUtils');
+const MyMongoClient = require('../../db/mongoClient');
+const ProductDao = require('../../daos/message/messageDao');
+const {asPOJO,removeField,renameField} = require('../../../utils/objectUtils');
+const messageModel = require('../../schema/messageModel');
 
 class ContenedorMongoDb extends ProductDao  {
     constructor() {
+        super();
         this.client = new MyMongoClient();
         this.client.connect();
-        this.coleccion = productModel;
+        this.coleccion = messageModel;
     }
 
     async getById(id) {

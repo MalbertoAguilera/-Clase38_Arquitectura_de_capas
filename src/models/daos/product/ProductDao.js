@@ -1,9 +1,7 @@
 const CustomError = require('../../error/CustomError');
-
 //kind of interface
-
 class ProductosDao {
-
+ 
     async getAll() {
         throw new CustomError(500, 'falta implementar getAll!')
     }

@@ -46,6 +46,7 @@ const addInfo = () => {
     text: document.querySelector("#text").value,
   };
 
+  console.log(objMessage);
   socket.emit("client_newMessage", objMessage);
   document.querySelector("#text").value = "";
   return false;

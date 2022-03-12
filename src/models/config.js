@@ -2,7 +2,8 @@ module.exports = {
   mongodb: {
     cnxStr:
       "mongodb+srv://matias:atlas1234@sessionatlas.jvq29.mongodb.net/DAOS?retryWrites=true&w=majority",
-    collectionProduct: "products"
+    collectionProduct: "products",
+    collectionMessages: "messages",
   },
   firebase: {
     type: "service_account",

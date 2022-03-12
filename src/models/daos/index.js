@@ -1,6 +1,7 @@
 let productosDao;
 let carritosDao;
 
+
 switch (process.env.PERSISTENCIA || "mongodb") {
   // case 'firebase':
   //     const ProductosDaoFirebase= await require('./productos/ProductosDaoFirebase.js')
@@ -10,12 +11,12 @@ switch (process.env.PERSISTENCIA || "mongodb") {
   //     carritosDao = new CarritosDaoFirebase()
   //     break
   case "mongodb":
-    const ProductosDaoMongoDb = await require("../containers/ContenedorMongoDb");
-    // const CarritosDaoMongoDb = await require('./carritos/CarritosDaoMongoDb.js')
+    const ProductosDaoMongoDb = require("../containers/product/ContenedorMongoDb");
+    const MessageDaoMongoDb = require('../containers/message/ContenedorMongoDb')
 
-    productosDao = new ProductosDaoMongoDb();
-    // carritosDao = new CarritosDaoMongoDb()
+    ProductosDao = ProductosDaoMongoDb;
+    MessagesDao = MessageDaoMongoDb;
     break;
 }
 
-export { productosDao, carritosDao };
+module.exports = { ProductosDao, MessagesDao };

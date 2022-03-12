@@ -1,7 +1,7 @@
-const {productosDao} = require('../models/daos/index');
+const {ProductosDao} = require('../models/daos/index');
 
-export default class ProductosApi {
-  constructor() {
+class ProductosApi {
+  constructor () {
     this.productosDao = new ProductosDao();
   }
 
@@ -40,3 +40,5 @@ export default class ProductosApi {
     this.productosDao.exit();
   }
 }
+
+module.exports = ProductosApi;
