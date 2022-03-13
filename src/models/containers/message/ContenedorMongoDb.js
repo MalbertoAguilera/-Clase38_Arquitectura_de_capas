@@ -54,7 +54,7 @@ class ContenedorMongoDb extends ProductDao  {
           result = await productos.findOneAndReplace(
             { _id: idParaReemplazar },
             nuevoProd,
-            this.projection,
+            { __v: 0 },
           );
         } catch (error) {
           throw new Error(`error al reemplazar al producto`);

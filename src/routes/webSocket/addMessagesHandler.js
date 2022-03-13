@@ -10,7 +10,6 @@ const addProductsHandler = async (socket, io) => {
 
   socket.on("client_newMessage", async (objmessage) => {
     objmessage.date = new Date().toLocaleString();
-    console.log("HASTA ACA LLEGUE BIEN",objmessage);
     await messagesApi.agregar(objmessage);
     io.emit("server_sendMessages", listarMensajesNormalizados(await messagesApi.buscar())
     );

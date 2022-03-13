@@ -1,5 +1,7 @@
 var socket = io();
 
+// MENSAJES
+
 /* --------------------- DESNORMALIZACIÓN DE MENSAJES ---------------------------- */
 // Definimos un esquema de autor
 const schemaAuthor = new normalizr.schema.Entity('author', {}, { idAttribute: 'id' });
@@ -9,6 +11,7 @@ const schemaMensaje = new normalizr.schema.Entity('post', { author: schemaAuthor
 
 // Definimos un esquema de posts
 const schemaMensajes = new normalizr.schema.Entity('posts', { mensajes: [schemaMensaje] }, { idAttribute: 'id' })
+/* ----------------------------------------------------------------------------- */
 
 socket.on("server_sendProducts", (arrProducts) => {
   renderTable(arrProducts);
@@ -68,6 +71,7 @@ const addProduct = () => {
   let objMsn = {
     title: document.querySelector("#title").value,
     price: document.querySelector("#price").value,
+    stock: document.querySelector("#stock").value,
     thumbnail: "https://picsum.photos/50",
   };
 
@@ -75,6 +79,7 @@ const addProduct = () => {
 
   document.querySelector("#title").value = "";
   document.querySelector("#price").value = "";
+  document.querySelector("#stock").value = "";
   document.querySelector("#thumbnail").value = "";
 
   return false;
@@ -87,6 +92,7 @@ const renderTable = (data) => {
         <tr>
           <th scope="row">${item.title}</th>
           <td>$${item.price}</td>
+          <td>${item.stock}</td>
           <td>
             <img
               src="${item.thumbnail}"
