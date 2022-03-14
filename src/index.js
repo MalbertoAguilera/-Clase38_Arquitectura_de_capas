@@ -19,12 +19,13 @@ const routeInfo = require("./routes/routeInfo");
 const routeProductosTest = require("./routes/routeProductosTest");
 const routeAuth = require("./routes/routeAuth");
 
-//session
+//otros
+require("dotenv").config();
+const path = require("path");
+const  cors =require( 'cors');
+const  morgan =require( 'morgan');
 const objectSession = require("./config/session");
 const session = require("express-session");
-
-const path = require("path");
-require("dotenv").config();
 
 //configuracion minimist
 const options = { default: { port: 8080 } };
@@ -33,6 +34,8 @@ const PORT = objectMinimist.port; //pasar como --port=(numero)
 const modoCluster = objectMinimist.modo === "cluster";
 
 //middlewares
+app.use(morgan('dev'))
+app.use(cors())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
