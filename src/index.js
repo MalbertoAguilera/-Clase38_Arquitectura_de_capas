@@ -44,6 +44,13 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(session(objectSession));
 
+//Testing
+const {get,post,deleteItem} = require('./Desafios/axios/http');
+// get();
+// post();
+deleteItem();
+get();
+
 //---------fork//cluster-----------
 if (modoCluster && cluster.isMaster) {
   for (let index = 0; index < numCPU; index++) {
