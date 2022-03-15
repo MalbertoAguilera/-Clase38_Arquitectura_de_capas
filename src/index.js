@@ -18,6 +18,7 @@ const routeNumAleatorios = require("./routes/routeNumerosAleatorios");
 const routeInfo = require("./routes/routeInfo");
 const routeProductosTest = require("./routes/routeProductosTest");
 const routeAuth = require("./routes/routeAuth");
+const routerProducts = require('./routes/routerProducts');
 
 //otros
 require("dotenv").config();
@@ -43,19 +44,21 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(session(objectSession));
 
-//server
+//---------fork//cluster-----------
 if (modoCluster && cluster.isMaster) {
   for (let index = 0; index < numCPU; index++) {
     cluster.fork();
   }
 } else {
+
+  //Rutas
   app.use(routeNumAleatorios);
   app.use(routeInfo);
   app.use(routeProductosTest);
   app.use(routeAuth);
+  app.use('/products',routerProducts);
 
   //WEB SOCKET
-
   io.on("connection", async (socket) => {
     console.log('WEB SOCKET - Nuevo cliente conectado!');
     addProductsHandlers(socket, io.sockets);
