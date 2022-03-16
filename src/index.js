@@ -35,21 +35,21 @@ const PORT = objectMinimist.port; //pasar como --port=(numero)
 const modoCluster = objectMinimist.modo === "cluster";
 
 //middlewares
-app.use(morgan('dev'))
-app.use(cors())
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(session(objectSession));
+app.use(morgan('dev'))
+app.use(cors())
 
-//Testing
-const {get,post,deleteItem} = require('./Desafios/axios/http');
+//Testing AXIOS
+// const {get,post,deleteItem} = require('./Desafios/axios/http');
 // get();
 // post();
-deleteItem();
-get();
+// deleteItem();
+
 
 //---------fork//cluster-----------
 if (modoCluster && cluster.isMaster) {
