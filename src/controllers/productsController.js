@@ -1,4 +1,3 @@
-const { json } = require("express/lib/response");
 const ProductsService = require("../services/productsService");
 const productosApi = new ProductsService();
 
