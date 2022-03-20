@@ -73,6 +73,7 @@ class ContenedorMongoDb extends ProductDao  {
             if (n == 0 || nDeleted == 0) {
                 throw new Error('Error al borrar: no encontrado')
             }
+            return `Borrado ${id} EXITOSO`;
         } catch (error) {
             throw new Error(`Error al borrar: ${error}`)
         }
