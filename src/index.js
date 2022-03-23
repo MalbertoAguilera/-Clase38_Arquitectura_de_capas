@@ -17,6 +17,7 @@ const addProductsHandlers = require("./routes/webSocket/addProductsHandler");
 const addMensajesHandlers = require("./routes/webSocket/addMessagesHandler");
 
 //-----------rutas
+const routeAuth2 = require("./routes/routeAuth2");
 const routeNumAleatorios = require("./routes/routeNumerosAleatorios");
 const routeInfo = require("./routes/routeInfo");
 const routeProductosTest = require("./routes/routeProductosTest");
@@ -25,11 +26,15 @@ const routerProducts = require("./routes/routerProducts");
 
 //otros
 require("dotenv").config();
+require('./passport/local-auth');
+const engine = require("ejs-mate");
 const path = require("path");
 const cors = require("cors");
 const morgan = require("morgan");
+const passport = require("passport");
 const objectSession = require("./config/session");
 const session = require("express-session");
+const flash = require("connect-flash");
 // const { schema } = require("./models/schema/productModel");
 
 //configuracion minimist
@@ -43,16 +48,38 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("views", path.join(__dirname, "views"));
+app.engine("ejs", engine);
 app.set("view engine", "ejs");
-app.use(session(objectSession));
 app.use(morgan("dev"));
 app.use(cors());
+
+//session
+app.use(session(objectSession));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+  app.locals.signupMessage = req.flash("signupMessage");
+  app.locals.signinMessage = req.flash("signinMessage");
+  app.locals.user = req.user;
+  next();
+});
 
 //Testing AXIOS
 // const {get,post,deleteItem} = require('./Desafios/axios/http');
 // get();
 // post();
 // deleteItem();
+
+//global variables
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash("success_msg");
+  res.locals.error_msg = req.flash("error_msg");
+  res.locals.error = req.flash("error");
+  res.locals.user = req.user || null;
+  next();
+});
 
 //---------fork//cluster-----------
 if (modoCluster && cluster.isMaster) {
@@ -61,17 +88,18 @@ if (modoCluster && cluster.isMaster) {
   }
 } else {
   //Rutas
+  app.use(routeAuth2);
   app.use(routeNumAleatorios);
   app.use(routeInfo);
   app.use(routeProductosTest);
-  app.use(routeAuth);
+  // app.use(routeAuth);
   app.use("/products", routerProducts);
   app.use(
     "/graphql",
     graphqlHTTP({
       graphiql: true,
       schema: schemaGraphql,
-      rootValue: rootGraphQL
+      rootValue: rootGraphQL,
     })
   );
 
